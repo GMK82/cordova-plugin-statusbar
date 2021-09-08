@@ -34,6 +34,7 @@ import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.LOG;
 import org.apache.cordova.PluginResult;
 import org.json.JSONException;
+import org.json.JSONObject;
 import java.util.Arrays;
 
 public class StatusBar extends CordovaPlugin {
@@ -91,7 +92,11 @@ public class StatusBar extends CordovaPlugin {
 
         if ("_ready".equals(action)) {
             boolean statusBarVisible = (window.getAttributes().flags & WindowManager.LayoutParams.FLAG_FULLSCREEN) == 0;
-            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, statusBarVisible));
+            int statusBarHeight = Math.round(getStatusBarHeight());
+            JSONObject r = new JSONObject();
+            r.put("isVisible", statusBarVisible);
+            r.put("height", statusBarHeight);
+            callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, r));
             return true;
         }
 
@@ -210,7 +215,23 @@ public class StatusBar extends CordovaPlugin {
             return true;
         }
 
+        if ("height".equals(action)) {
+            int statusBarHeight = Math.round(getStatusBarHeight());
+            callbackContext.success(statusBarHeight);
+            return true;
+        }
+
         return false;
+    }
+
+    private float getStatusBarHeight() {
+        float statusBarHeight = 0;
+        int resourceId = cordova.getActivity().getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            float scaleRatio = cordova.getActivity().getResources().getDisplayMetrics().density;
+            statusBarHeight = cordova.getActivity().getResources().getDimension(resourceId) / scaleRatio;
+        }
+        return statusBarHeight;
     }
 
     private void setStatusBarBackgroundColor(final String colorPref) {

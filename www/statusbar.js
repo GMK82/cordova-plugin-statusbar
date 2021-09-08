@@ -42,6 +42,7 @@ var namedColors = {
 
 var StatusBar = {
     isVisible: true,
+    height: 0,
 
     overlaysWebView: function (doOverlay) {
         exec(null, null, 'StatusBar', 'overlaysWebView', [doOverlay]);
@@ -105,6 +106,7 @@ window.setTimeout(function () {
                 }
             } else {
                 StatusBar.isVisible = res;
+                StatusBar.height = res.height;
             }
         },
         null,
